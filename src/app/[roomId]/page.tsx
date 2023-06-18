@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import "remixicon/fonts/remixicon.css";
+import RcFile from "rc-upload";
+import { Upload, message } from "antd";
 
 export default function Page({ params }: { params: { roomId: string } }) {
   const [video, setVideo] = useState<boolean>(true);
@@ -56,6 +58,14 @@ export default function Page({ params }: { params: { roomId: string } }) {
         });`;
       document.body.appendChild(script2);
     };
+  };
+
+  const handleFileUpload = (file: any, response: any) => {
+    // Assuming the response data is in JSON format with a 'url' property
+    const { url } = response;
+    // Do something with the URL
+    console.log(url);
+    setAvatar(url);
   };
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,12 +158,28 @@ export default function Page({ params }: { params: { roomId: string } }) {
             onChange={handleNameChange}
             value={name}
           />
-          <input
-            className="p-2 border rounded"
-            placeholder="Your avatar Url"
-            onChange={handleAvatarChange}
-            value={avatar}
-          />
+          <div className="bg-white p-4 rounded">
+            <Upload
+              action="https://files-lider.it-pfiev-dut.tech/api/upload"
+              accept="image/*"
+              onChange={(info) => {
+                const { status, response } = info.file;
+                if (status === "done") {
+                  message.success(
+                    `${info.file.name} fi le uploaded successfully.`
+                  );
+                  handleFileUpload(info.file, response);
+                } else if (status === "error") {
+                  message.error(`${info.file.name} file upload failed.`);
+                }
+              }}
+            >
+              <button className="text-black">
+                <i className="ri-upload-2-line"></i> Upload avatar
+              </button>
+            </Upload>
+          </div>
+
           <button
             className="bg-[#0e78f8] text-white p-2 rounded w-full"
             onClick={handleJoinMeeting}
